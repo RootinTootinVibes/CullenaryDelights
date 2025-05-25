@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 
 public class RecipeController : Controller
@@ -12,7 +13,7 @@ public class RecipeController : Controller
 
     public IActionResult Index()
     {
-        var recipes = _context.Recipes.ToList();
+        var recipes = _context.Recipes.Include(x => x.Steps).ToList();
         return View(recipes);
     }
 

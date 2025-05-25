@@ -10,4 +10,5 @@ public class ApplicationDbContext : DbContext
     public DbSet<Bookmark> Bookmarks { get; set; }
     public DbSet<Ingredient> Ingredients { get; set; }
     public DbSet<RecipeIngredient> RecipeIngredients { get; set; }
+    public DbSet<Step> Steps { get; set; }
 }

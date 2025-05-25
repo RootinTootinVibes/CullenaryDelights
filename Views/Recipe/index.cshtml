@@ -6,6 +6,9 @@
 {
     <div>
         <h3>@recipe.Name</h3>
-        <p>@recipe.Instructions</p>
+        @foreach (var step in recipe.Steps)
+        {
+            <p>@step.Instruction</p>
+        }
     </div>
 }
