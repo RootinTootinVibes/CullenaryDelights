@@ -1,0 +1,18 @@
+@model (Recipe, List<RecipeIngredient>)
+
+<h1>@Model.Item1.Name</h1>
+
+@foreach (var ingredient in Model.Item2)
+{
+    <p>
+        @ingredient.Quantity @ingredient.Ingredient.Name
+    </p>
+}
+
+@foreach (var step in Model.Item1.Steps)
+{
+    <p>
+        @step.Instruction
+    </p>
+}
+

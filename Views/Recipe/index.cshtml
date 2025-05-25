@@ -6,9 +6,6 @@
 {
     <div>
         <h3>@recipe.Name</h3>
-        @foreach (var step in recipe.Steps)
-        {
-            <p>@step.Instruction</p>
-        }
+        <a href="/Recipe/FullRecipe?recipeID=@recipe.RecipeID" class="btn btn-primary active" role="button">Full Recipe</a> 
     </div>
 }

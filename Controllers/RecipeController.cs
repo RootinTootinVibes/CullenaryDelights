@@ -31,4 +31,11 @@ public class RecipeController : Controller
 
         return View(recipe);
     }
+
+    public IActionResult FullRecipe([FromQuery]int recipeID)
+    {
+        var recipe =_context.Recipes.Where(x => x.RecipeID == recipeID).Include(x => x.Steps).Single();
+        var recipeIngredients = _context.RecipeIngredients.Include(x => x.Ingredient).Where(x => x.RecipeID == recipeID).ToList();
+        return View((recipe, recipeIngredients));
+    }
 }
