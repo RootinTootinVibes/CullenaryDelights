@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using RecipeWebsite.Models;
 
 namespace RecipeWebsite.Controllers;
@@ -29,9 +30,24 @@ public class HomeController : Controller
         return View();
     }
 
-    public IActionResult Privacy()
+    [HttpGet("Home/Login")]
+    public IActionResult LoginGet()
     {
-        return View();
+        return View("Login");
+    }
+
+    [HttpPost("Home/Login")]
+    public IActionResult LoginPost([FromForm] string userName, [FromForm] string userPassword)
+    {
+        var user = _dbContext.Users.Where(x => x.UserName == userName).SingleOrDefault();
+        if (user != null && userPassword == user.UserPassword)
+        {
+            return Redirect("/");
+        }
+        else
+        {
+            return View("Login");
+        }
     }
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
