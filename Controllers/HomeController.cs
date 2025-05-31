@@ -2,7 +2,7 @@ using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RecipeWebsite.Models;
-using BCrypt.Net;
+using BC = BCrypt.Net.BCrypt;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication;
@@ -128,7 +128,7 @@ public class HomeController : Controller
         var user = _dbContext.Users
                     .SingleOrDefault(u => u.UserName == lm.Name);
 
-        if (user == null || lm.Password != user.UserPassword)
+        if (user == null || !BC.Verify(lm.Password, user.UserPassword))
         {
             ModelState.AddModelError("", "Invalid credentials.");
             return View(lm);

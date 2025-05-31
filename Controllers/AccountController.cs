@@ -36,8 +36,11 @@ public class AccountController : Controller
         return View(vm);
     }
 
+    [HttpGet]
+    public IActionResult ChangePassword() => View();
+
     [HttpPost]
-    [ValidateAntiForgeryToken]
+    //[ValidateAntiForgeryToken]
     public IActionResult ChangePassword(ChangePassword password)
     {
         var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
@@ -56,16 +59,7 @@ public class AccountController : Controller
 
         if (!ModelState.IsValid)
         {
-            var vm = new Account
-            {
-                Profile = new EditProfile
-                {
-                    Username = user.UserName,
-                    Email = user.UserEmail
-                },
-                ChangePassword = password
-            };
-            return View("Index", vm);
+            return Redirect("/Account/ChangePassword");
         }
 
         user.UserPassword = BC.HashPassword(password.NewPassword);

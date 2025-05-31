@@ -3,35 +3,7 @@
 
 <h2>My Account</h2>
 
-@if (TempData["ProfileSuccess"] != null) 
-{
-    <div class="alert alert-success">@TempData["ProfileSuccess"]</div>
-}
 
-<form asp-action="ChangePassword" method="post">
-    @Html.AntiForgeryToken()
-    <fieldset>
-        <legend>Change Password</legend>
 
-        <div>
-            <label asp-for="ChangePassword.OldPassword"></label>
-            <input asp-for="ChangePassword.OldPassword" type="password" />
-            <span asp-validation-for="ChangePassword.OldPassword"></span>
-        </div>
-        
-        <div>
-            <label asp-for="ChangePassword.NewPassword"></label>
-            <input asp-for="ChangePassword.NewPassword" type="password" />
-            <span asp-validation-for="ChangePassword.NewPassword"></span>
-        </div>
-
-        <div>
-            <label asp-for="ChangePassword.ConfirmNewPassword"></label>
-            <input asp-for="ChangePassword.ConfirmNewPassword" type="password" />
-            <span asp-validation-for="ChangePassword.ConfirmNewPassword"></span>
-        </div>
-
-        <button type="submit">Change Password</button>
-    </fieldset>
-</form>
+<a href="/Account/ChangePassword">Change Password</a>
 
