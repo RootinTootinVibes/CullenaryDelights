@@ -1,30 +1,43 @@
 @model Recipe
-
 @{
-    ViewData["Title"] = "Create Recipe";
+    ViewData["Title"] = "Edit Recipe";
 }
-<h1>Submit a Recipe</h1>
-<form action="/Recipe/Create" method="post">
+
+<h1>Edit Recipe</h1>
+
+<form action="/Recipe/Edit" method="post" enctype="multipart/form-data">
     @Html.AntiForgeryToken()
-        <div class="container">
+    <input type="hidden" asp-for="RecipeID" />
+
+    <div class="container"></div>
             <p>
-                <label for="Name"><b>Recipe Name</b></label>
-                <input type="text" placeholder="Name" name="Name" required>
+                <label for="Name"><b>Name</b></label>
+                <input type="text" value="@Model.Name" name="Name" required>
             </p>
             <p>
                 <label for="PrepTimeMinutes"><b>Prep Time</b></label>
-                <input type="number" placeholder="Prep Time (Minutes)" name="PrepTimeMinutes" required>
+                <input type="number" value="@Model.PrepTimeMinutes" name="PrepTimeMinutes" required>
             </p>
             <p>
                 <label for="CookTimeMinutes"><b>Cook Time</b></label>
-                <input type="number" placeholder="Cook Time (Minutes)" name="CookTimeMinutes" required>
+                <input type="number" value="@Model.CookTimeMinutes" name="CookTimeMinutes" required>
             </p>
 
             <hr />
 
             <h3>Steps</h3>
             <div id="steps-container">
-                <!-- JS will add step inputs here  -->
+                @for (int i = 0; i < Model.Steps.Count; i++)
+                {
+                    <div class="step-item">
+                        <label>Step @(i + 1):</label>
+                        <input type="text"
+                            name="Steps[@i].Description"
+                            value="@Model.Steps.ElementAt(i).Instruction"
+                            required />
+                        <button type="button" class="remove-step-btn">Remove Step</button>
+                    </div>
+                }
             </div>
             <button type="button" id="add-step-btn">+ Add Step</button>
 
@@ -32,24 +45,36 @@
 
             <h3>Ingredients</h3>
             <div id="ingredients-container">
-                <!--JS will add ingredient inputs here -->
+                @for (int i = 0; i < Model.Ingredients.Count; i++)
+                {
+                    <div class="ingredient-item">
+                        <label>Ingredient @(i + 1):</label>
+                        <input type="text"
+                            name="Ingredients[@i].Ingredient.Name"
+                            value="@Model.Ingredients.ElementAt(i).Ingredient.Name"
+                            required />
+                        <input type="text"
+                            name="Ingredients[@i].Quantity"
+                            value="@Model.Ingredients.ElementAt(i).Quantity"
+                            required />
+                        <button type="button" class="remove-ingredient-btn">Remove Ingredient</button>
+                    </div>
+                }
             </div>
             <button type="button" id="add-ingredient-btn">+ Add Ingredient</button>
 
             <button type="submit">Save Recipe</button>
             <a asp-action="MyRecipes">Cancel</a>
         </div>
-    </form>
+</form>
 
-    @section Scripts {    
+    @section Scripts {
+
         <script type="text/javascript">
-            console.log("script running");
             // Keep counters so fields are named Steps[0], Steps[1], etc.
-            let stepIndex = 0;
-            let ingredientIndex = 0;
-
-            if (document.getElementById('add-step-btn') == null)
-                console.error('Could not find step button');
+            let stepIndex = @Model.Steps.Count;
+            let ingredientIndex = @Model.Ingredients.Count;
+            console.log("script running");
 
             document.getElementById('add-step-btn').addEventListener('click', () => {
                 const container = document.getElementById('steps-container');

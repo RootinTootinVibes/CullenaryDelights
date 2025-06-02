@@ -1,11 +1,36 @@
 @model IEnumerable<Recipe>
+@{
+    ViewData["Title"] = "All Recipes";
+    var currentFilter = ViewData["CurrentFilter"] as string;
+}
 
 <h1>All Recipes</h1>
 
-@foreach (var recipe in Model)
+<form action="/Recipe/index" method="get">
+    <input
+        name="search"
+        placeholder="Search by recipe name (use * for wildcard)..."
+        value="@currentFilter" />
+    <button type="submit">Search</button>
+</form>
+
+@if (!Model.Any())
 {
-    <div>
-        <h3>@recipe.Name</h3>
-        <a href="/Recipe/FullRecipe?recipeID=@recipe.RecipeID" class="btn btn-primary active" role="button">Full Recipe</a> 
-    </div>
+    <p>No Recipes Found.</p>
 }
+else
+{
+    <ul>
+        @foreach (var recipe in Model)
+        {
+            Console.WriteLine(recipe.RecipeID);
+            <li>
+                <strong>@recipe.Name</strong>
+                <em>by @recipe.User.UserName</em>
+                |
+                <a href="/Recipe/FullRecipe?recipeID=@recipe.RecipeID">View</a>
+            </li>
+        }
+    </ul>
+}
+

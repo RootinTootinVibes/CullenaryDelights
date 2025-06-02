@@ -1,18 +1,34 @@
-@model (Recipe, List<RecipeIngredient>)
+@model Recipe
 
-<h1>@Model.Item1.Name</h1>
+<h1>@Model.Name</h1>
+<p><em>by: @Model.User.UserName</em></p>
 
-@foreach (var ingredient in Model.Item2)
+@if (Model.Picture != null)
 {
-    <p>
-        @ingredient.Quantity @ingredient.Ingredient.Name
-    </p>
+    <img src="data:image/png;base64,@Convert.ToBase64String(Model.Picture)"
+        alt="Recipe image" style="max-width:400px;" />
 }
 
-@foreach (var step in Model.Item1.Steps)
-{
-    <p>
-        @step.Instruction
-    </p>
-}
+<h3>Preparation Time: @Model.PrepTimeMinutes</h3>
+<h3>Cook Time: @Model.CookTimeMinutes</h3>
+<h3>Total Time: @Model.TotalTimeMinutes</h3>
 
+<h4>Ingredients:</h4>
+<ul>
+    @foreach (var ingredient in Model.Ingredients)
+    {
+        <li>@ingredient.Quantity @ingredient.Ingredient.Name</li>
+    }
+</ul>
+
+<h4>Steps:</h4>
+<ol>
+    @foreach (var step in Model.Steps)
+    {
+        <li>@step.Instruction</li>
+    }
+</ol>
+
+<p>
+    <a action="index">Back to All Recipes</a>
+</p>

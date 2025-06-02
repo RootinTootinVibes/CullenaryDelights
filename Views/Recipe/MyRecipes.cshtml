@@ -1,0 +1,35 @@
+@model IEnumerable<Recipe>
+
+<h1>My Recipes</h1>
+
+<p>
+    <a href="/Recipe/Create" action="Create" class="btn btn-primary">+ New Recipe</a>
+</p>
+
+@if (!Model.Any())
+{
+    <p>You haven't created any recipes yet.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var recipe in Model)
+            {
+                <tr>
+                    <td>@recipe.Name</td>
+                    <td>
+                        <a href="/Recipe/Edit?recipeID=@recipe.RecipeID">Edit</a> |
+                        <a href="/Recipe/Edit?recipeID=@recipe.RecipeID">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
