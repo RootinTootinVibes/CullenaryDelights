@@ -69,20 +69,52 @@ public class RecipeController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public IActionResult Create(Recipe recipe)
+    public IActionResult Create(WebRecipe recipe)
     {
         var user = GetCurrentUser();
         if (!ModelState.IsValid)
         {
             return View(recipe);
         }
-        recipe.UserID = user.UserID;
-        recipe.TotalTimeMinutes = recipe.PrepTimeMinutes + recipe.CookTimeMinutes;
+        Recipe dbRecipe = new Recipe
+        {
+            Name = recipe.Name,
+            PrepTimeMinutes = recipe.PrepTimeMinutes,
+            CookTimeMinutes = recipe.CookTimeMinutes,
+            TotalTimeMinutes = recipe.PrepTimeMinutes + recipe.CookTimeMinutes,
+            UserID = user.UserID,
+            RecipeID = recipe.RecipeID
+        };
 
-        _context.Recipes.Add(recipe);
+        _context.Recipes.Add(dbRecipe);
+        var ingredients = recipe.Ingredients.ConvertAll(x => new Ingredient
+        {
+            Name = x.Name,
+            FoodGroup = ""
+        });
+        _context.Ingredients.AddRange(ingredients);
         _context.SaveChanges();
 
-        return View(recipe);
+        int ordinalId = 0;
+        foreach (var step in recipe.Steps)
+        {
+            step.RecipeID = dbRecipe.RecipeID;
+            step.StepOrdinal = ordinalId++;
+        }
+
+        int n = 0;
+        var recipeIngredients = ingredients.ConvertAll(x => new RecipeIngredient
+        {
+            RecipeID = dbRecipe.RecipeID,
+            IngredientID = x.IngredientID,
+            Quantity = recipe.Ingredients[n++].Quantity,
+
+        });
+        _context.RecipeIngredients.AddRange(recipeIngredients);
+        _context.Steps.AddRange(recipe.Steps);
+        _context.SaveChanges();
+
+        return View(dbRecipe);
     }
 
     [HttpGet]
@@ -160,11 +192,11 @@ public class RecipeController : Controller
     }
 
     [HttpGet]
-    public IActionResult Delete(int id)
+    public IActionResult Delete(int recipeID)
     {
         var user = GetCurrentUser();
         var recipe = _context.Recipes
-            .FirstOrDefault(r => r.RecipeID == id && r.UserID == user.UserID);
+            .FirstOrDefault(r => r.RecipeID == recipeID && r.UserID == user.UserID);
 
         if (recipe == null)
             return Forbid();
@@ -174,15 +206,17 @@ public class RecipeController : Controller
 
     [HttpPost, ActionName("Delete")]
     [ValidateAntiForgeryToken]
-    public IActionResult DeleteConfirmed(int id)
+    public IActionResult DeleteConfirmed(int recipeID)
     {
         var user = GetCurrentUser();
         var recipe = _context.Recipes
-            .FirstOrDefault(r => r.RecipeID == id && r.UserID == user.UserID);
+            .FirstOrDefault(r => r.RecipeID == recipeID && r.UserID == user.UserID);
 
         if (recipe == null)
             Forbid();
 
+        _context.RecipeIngredients.Where(x => x.RecipeID == recipeID).ExecuteDelete();
+        _context.Steps.Where(x => x.RecipeID == recipeID).ExecuteDelete();
         _context.Recipes.Remove(recipe);
         _context.SaveChanges();
 

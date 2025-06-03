@@ -76,8 +76,8 @@
             let ingredientIndex = @Model.Ingredients.Count;
             console.log("script running");
 
+            const container = document.getElementById('steps-container');
             document.getElementById('add-step-btn').addEventListener('click', () => {
-                const container = document.getElementById('steps-container');
 
                 // Create a new DIV to hold this step's fields
                 const stepDiv = document.createElement("div");
@@ -89,22 +89,22 @@
                     <button type="button" class="remove-step-btn">Remove Step</button
                 `;
                 container.appendChild(stepDiv);
-
-                //Wire up the "remove button for the step"
-                stepDiv.querySelector('.remove-step-btn').addEventListener('click', () => {
-                    container.removeChild(stepDiv);
-                    //reindexes steps for steps removed from the middle
-                    document.getElementById('steps-container').addEventListener('click', function(e) {
-                        if (e.target.classList.contains('remove-step-btn')) {
-                            const toRemove = e.target.closest('.step-item');
-                            toRemove.remove();
-                            reindexSteps();
-                        }
-                    });
-                });
-
                 stepIndex++;
+
+                });
+                //Wire up the "remove button for the step"
+                container.addEventListener('click', function (e) {
+                    console.log("remove button clicked");
+                    if (e.target && e.target.classList.contains('remove-step-btn')) {
+                        const toRemove = e.target.closest('.step-item');
+                        toRemove.remove();
+                        reindexSteps();
+                    }
+
+                });
             });
+
+            const fullIngDiv = document.getElementById('ingredients-container');
 
             document.getElementById('add-ingredient-btn').addEventListener('click', () => {
                 const container = document.getElementById('ingredients-container');
@@ -117,23 +117,24 @@
                         placeholder="Ingredient" required />
                     <input type="text" name="Ingredients[${ingredientIndex}].Quantity"
                         placeholder="Quantity (e.g. '2 cups')" />
-                    <button type="button" class="remove-ingredients-btn">Remove</button>
+                    <button type="button" class="remove-ingredient-btn">Remove Ingredient</button>
                 `;
                 container.appendChild(ingDiv);
-
-                ingDiv.querySelector('.remove-ingredient-btn').addEventListener('click', () => {
-                    container.removeChild(ingDiv);
-                    document.getElementById('ingredients-container').addEventListener('click', function(e) {
-                        if (e.target.classList.contains('remove-ingredient-btn')) {
-                            const toRemove = e.target.closest('.ingredient-item');
-                            toRemove.remove();
-                            reindexIngredients();
-                        }
-                    });
-                });
-
                 ingredientIndex++;
             });
+
+                @* document.getElementsByClassName("remove-ingredient-btn").forEach(e => e.addEventListener('click', () => {
+                    console.log("button clicked");
+                }));  *@
+                fullIngDiv.addEventListener('click', function (e) {
+                    console.log("remove button clicked");
+                    if (e.target && e.target.classList.contains('remove-ingredient-btn')) {
+                        const toRemove = e.target.closest('.ingredient-item');
+                        toRemove.remove();
+                        reindexIngredients();
+                    }
+
+                });
 
             function reindexSteps() {
                 const container = document.getElementById('steps-container');
@@ -152,12 +153,17 @@
                 const container = document.getElementById('ingredients-container');
                 const items = container.querySelectorAll('.ingredient-item');
                 items.forEach((ingDiv, i) => {
-                    //Update label
-                    ingDiv.querySelector('label').innerText = `Ingredient ${i + 1}:`;
-                    //Update input
-                    const input = ingDiv.querySelector('input[type="text"]');
-                    input.Name = `Ingrediests[${i}].Ingredient.Name`;
-                    input.Quantity = `Ingredients[${i}].Quantity`
+                    // Update the <label> text
+                    const lbl = ingDiv.querySelector("label");
+                    lbl.innerText = `Ingredient ${idx + 1}:`;
+
+                    // Rename the Name input
+                    const nameInput = ingDiv.querySelector("input[name^='RecipeIngredients'][name$='.Name']");
+                    nameInput.name = `RecipeIngredients[${idx}].Name`;
+
+                    // Rename the Quantity input
+                    const qtyInput = ingDiv.querySelector("input[name^='RecipeIngredients'][name$='.Quantity']");
+                    qtyInput.name = `RecipeIngredients[${idx}].Quantity`;
                 });
                 ingredientIndex = items.length;
             }
