@@ -103,13 +103,14 @@ public class RecipeController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public IActionResult Edit(int recipeID, Recipe recipe)
+    public IActionResult Edit(int recipeID, WebRecipe recipe)
     {
         if (recipeID != recipe.RecipeID)
             return BadRequest();
 
         var user = GetCurrentUser();
         var existing = _context.Recipes
+            .Include(r => r.User)
             .Include(r => r.Steps)
             .Include(r => r.Ingredients)
                 .ThenInclude(ri => ri.Ingredient)
@@ -121,15 +122,38 @@ public class RecipeController : Controller
         if (!ModelState.IsValid)
             return View(recipe);
 
+
+        var ingredients = recipe.Ingredients.ConvertAll(x => new Ingredient
+        {
+            Name = x.Name,
+            FoodGroup = ""
+        });
+        _context.Ingredients.AddRange(ingredients);
+        _context.SaveChanges();
         existing.Name = recipe.Name;
         existing.PrepTimeMinutes = recipe.PrepTimeMinutes;
         existing.CookTimeMinutes = recipe.CookTimeMinutes;
         existing.TotalTimeMinutes = existing.PrepTimeMinutes + existing.CookTimeMinutes;
-        existing.Picture = recipe.Picture;
-        existing.Steps = recipe.Steps;
-        existing.Ingredients = recipe.Ingredients;
+        _context.Steps.RemoveRange(existing.Steps);
+        //_context.SaveChanges();
+        int ordinalId = 0;
+        foreach (var step in recipe.Steps)
+        {
+            step.RecipeID = existing.RecipeID;
+            step.StepOrdinal = ordinalId++;
+        }
+        _context.Steps.AddRange(recipe.Steps);
+        _context.RecipeIngredients.RemoveRange(existing.Ingredients);
+        int n = 0;
+        var recipeIngredients = ingredients.ConvertAll(x => new RecipeIngredient
+        {
+            RecipeID = existing.RecipeID,
+            IngredientID = x.IngredientID,
+            Quantity = recipe.Ingredients[n++].Quantity,
 
-        _context.Recipes.Update(existing);
+        });
+        _context.RecipeIngredients.AddRange(recipeIngredients);
+
         _context.SaveChanges();
 
         return RedirectToAction(nameof(MyRecipes));

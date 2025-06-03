@@ -9,7 +9,7 @@ public class Step
     [ForeignKey(nameof(Recipe))]
     public int RecipeID { get; set; }
 
-    [Required]
+    
     public int StepOrdinal { get; set; }
     [Required]
     public string Instruction { get; set; }

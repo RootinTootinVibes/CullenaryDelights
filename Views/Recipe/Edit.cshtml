@@ -9,7 +9,7 @@
     @Html.AntiForgeryToken()
     <input type="hidden" asp-for="RecipeID" />
 
-    <div class="container"></div>
+    <div class="container">
             <p>
                 <label for="Name"><b>Name</b></label>
                 <input type="text" value="@Model.Name" name="Name" required>
@@ -32,7 +32,7 @@
                     <div class="step-item">
                         <label>Step @(i + 1):</label>
                         <input type="text"
-                            name="Steps[@i].Description"
+                            name="Steps[@i].Instruction"
                             value="@Model.Steps.ElementAt(i).Instruction"
                             required />
                         <button type="button" class="remove-step-btn">Remove Step</button>
@@ -50,7 +50,7 @@
                     <div class="ingredient-item">
                         <label>Ingredient @(i + 1):</label>
                         <input type="text"
-                            name="Ingredients[@i].Ingredient.Name"
+                            name="Ingredients[@i].Name"
                             value="@Model.Ingredients.ElementAt(i).Ingredient.Name"
                             required />
                         <input type="text"
@@ -80,8 +80,8 @@
                 const container = document.getElementById('steps-container');
 
                 // Create a new DIV to hold this step's fields
-                const stepDiv = document.createElement('div');
-                stepDiv.classList.add('step-item');
+                const stepDiv = document.createElement("div");
+                stepDiv.classList.add("step-item");
                 stepDiv.innerHTML = `
                     <label>Step ${stepIndex + 1}:</label>
                     <input type="text" name="Steps[${stepIndex}].Instruction"
@@ -113,7 +113,7 @@
                 ingDiv.classList.add('ingredient-item');
                 ingDiv.innerHTML = `
                     <label>Ingredient ${ingredientIndex + 1}:</label>
-                    <input type="text" name="Ingredients[${ingredientIndex}].Ingredient.Name"
+                    <input type="text" name="Ingredients[${ingredientIndex}].Name"
                         placeholder="Ingredient" required />
                     <input type="text" name="Ingredients[${ingredientIndex}].Quantity"
                         placeholder="Quantity (e.g. '2 cups')" />
