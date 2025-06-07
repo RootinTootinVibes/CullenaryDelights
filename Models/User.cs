@@ -15,6 +15,9 @@ public class User
     public string UserPassword { get; set; }
 
     public DateTimeOffset CreationDate { get; set; }
-    
+
     public ICollection<Recipe> Recipes { get; set; }
+
+    public List<CommentAndRating> CommentAndRatings { get; set; }
+        = new List<CommentAndRating>();
 }

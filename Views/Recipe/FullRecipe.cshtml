@@ -1,7 +1,19 @@
+@using System.Security.Claims
 @model Recipe
 
 <h1>@Model.Name</h1>
-<p><em>by: @Model.User.UserName</em></p>
+<p>
+    <em>by: @Model.User.UserName</em><br />
+    <em>Created:</em> @Model.CreatedAt.ToString("yyy-MM-dd")<br />
+    <em>Total Time:</em> @Model.TotalTimeMinutes min<br />
+    <strong>Overall Rating:</strong>
+    @(
+        Model.OverallRating.HasValue
+            ? Model.OverallRating.Value.ToString("0.0") + "/5"
+            : "No ratings yet"
+    )
+    
+</p>
 
 @if (Model.Picture != null)
 {
@@ -29,6 +41,77 @@
     }
 </ol>
 
+<hr />
+
+<!-- Comments and Ratings Section -->
+<h3>Comments and Ratings (@Model.CommentsAndRatings.Count())</h3>
+
+@if (!Model.CommentsAndRatings.Any())
+{
+    <p>No Comments yet. Be the first to share your thoughts!</p>
+}
+else
+{
+    <div style="margin-bottom: 20px;">
+        @foreach (var cr in Model.CommentsAndRatings)
+        {
+            <div style="border:1px solid #4d4d4d; padding:10px; margin-bottom:10px; border-radius:4px;">
+                <p>
+                    <strong>@cr.User.UserName</strong>
+                    <span style="float:right;">Rating: @cr.Rating/5</span>
+                </p>
+                <p>@cr.Comment</p>
+            </div>
+        }
+    </div>
+}
+
+@if (User.Identity.IsAuthenticated)
+{
+    <h4>Leave a Comment & Rating</h4>
+    <form asp-action="AddComment" asp-route-id="@Model.RecipeID" method="post">
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="RecipeID" />
+
+        <div asp-asp-validation-summary="All" class="text-danger"></div>
+
+        <div style="margin-bottom: 10px;">
+            <label for="rating">Your Rating (1-5):</label><br />
+            <select id="rating" name="rating" required style="width:80px; padding:4px">
+                <option value="">--</option>
+                @for (int i = 1; i <= 5; i++)
+                {
+                    <option value="@i">@i</option>
+                }
+            </select>
+        </div>
+
+        <div style="margin-bottom: 10px;">
+            <label for="comment">Your Comment:</label><br />
+            <textarea
+                id="comment"
+                name="comment"
+                rows="3"
+                required
+                style="width:400px; padding:4px;"></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+}
+else
+{
+    <p>
+        <a asp-controller="Home" asp-action="Login">Log in</a> to leave a comment or rating.
+    </p>
+}
+
 <p>
     <a action="index">Back to All Recipes</a>
+    @if (User.Identity.IsAuthenticated &&
+        int.Parse(User.FindFirstValue(System.Security.Claims.ClaimTypes.NameIdentifier)) == Model.UserID)
+    {
+        <a asp-action="Edit" asp-route-id="@Model.RecipeID">Edit Recipe</a>
+        <a asp-action="Delete" asp-route-id="@Model.RecipeID">Delete Recipe</a>
+    }
 </p>

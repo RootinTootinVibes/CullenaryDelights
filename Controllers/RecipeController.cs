@@ -16,8 +16,13 @@ public class RecipeController : Controller
 
     public IActionResult Index(string search)
     {
+
+        ViewData["CurrentFiler"] = search;
+
         var recipes = _context.Recipes.Include(x => x.Steps)
-            .Include(r => r.User).AsQueryable();
+            .Include(r => r.User)
+            .Include(r => r.Ingredients)
+            .AsQueryable();
 
         if (!string.IsNullOrWhiteSpace(search))
         {
@@ -26,7 +31,10 @@ public class RecipeController : Controller
             if (!pattern.Contains('%'))
                 pattern = $"%{pattern}";
 
-            recipes = recipes.Where(r => EF.Functions.ILike(r.Name, pattern));    
+            recipes = recipes.Where(r =>
+                EF.Functions.ILike(r.Name, pattern) ||
+                r.Ingredients.Any(ri =>
+                    EF.Functions.ILike(ri.Ingredient.Name, pattern)));    
         }
 
         var model = recipes
@@ -46,12 +54,76 @@ public class RecipeController : Controller
             .Include(r => r.Steps)
             .Include(r => r.Ingredients)
                 .ThenInclude(ri => ri.Ingredient)
+            .Include(r => r.CommentsAndRatings)
+                .ThenInclude(cr => cr.User)
             .FirstOrDefault(r => r.RecipeID == id);
 
         if (recipe == null)
             return NotFound();
 
         return View(recipe);
+    }
+
+    [HttpPost]
+    [Authorize]
+    [ValidateAntiForgeryToken]
+    public IActionResult AddComment(int recipeID, int rating, string comment)
+    {
+        //Validating comment
+        if (rating < 1 || rating > 5)
+            ModelState.AddModelError("Rating", "Rating must be between 1 & 5");
+
+        if (string.IsNullOrWhiteSpace(comment))
+            ModelState.AddModelError("Comment", "Comment cannot be empty");
+
+        if (!ModelState.IsValid)
+        {
+            //get the recipe exactly as in GET
+            var recipeToShow = _context.Recipes
+                .Include(r => r.User)
+                .Include(r => r.Steps)
+                .Include(r => r.Ingredients)
+                    .ThenInclude(ri => ri.Ingredient)
+                .Include(r => r.CommentsAndRatings)
+                    .ThenInclude(cr => cr.User)
+                .FirstOrDefault(r => r.RecipeID == recipeID);
+
+            if (recipeToShow == null)
+                return NotFound();
+
+            return View("Details", recipeToShow);
+        };
+
+        //Creating and saving new Comment and Rating
+        var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        int userId = int.Parse(userIdClaim);
+
+        var newComment = new CommentAndRating
+        {
+            UserID = userId,
+            RecipeID = recipeID,
+            Rating = rating,
+            Comment = comment
+        };
+
+        _context.CommentsAndRatings.Add(newComment);
+        _context.SaveChanges();
+
+        //Recalculating and updating recipe's overall rating
+        var allRatings = _context.CommentsAndRatings
+            .Where(cr => cr.RecipeID == recipeID)
+            .Select(cr => cr.Rating)
+            .ToList();
+
+        double average = allRatings.Any()
+            ? allRatings.Average()
+            : 0.0;
+
+        var recipeToUpdate = _context.Recipes.First(r => r.RecipeID == recipeID);
+        recipeToUpdate.OverallRating = average;
+        _context.SaveChanges();
+
+        return RedirectToAction("FullRecipe", new { recipeID = recipeID });
     }
 
     public IActionResult MyRecipes()
@@ -228,6 +300,7 @@ public class RecipeController : Controller
         var recipe = _context.Recipes
             .Include(r => r.User)
             .Include(r => r.Steps)
+            .Include(r => r.CommentsAndRatings)
             .Include(r => r.Ingredients)
                 .ThenInclude(ri => ri.Ingredient)
             .FirstOrDefault(r => r.RecipeID == recipeID);
