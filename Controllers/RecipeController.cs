@@ -155,7 +155,8 @@ public class RecipeController : Controller
             CookTimeMinutes = recipe.CookTimeMinutes,
             TotalTimeMinutes = recipe.PrepTimeMinutes + recipe.CookTimeMinutes,
             UserID = user.UserID,
-            RecipeID = recipe.RecipeID
+            RecipeID = recipe.RecipeID,
+            CreatedAt = DateTime.Now
         };
 
         _context.Recipes.Add(dbRecipe);

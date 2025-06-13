@@ -7,18 +7,18 @@
 <form action="/Recipe/Create" method="post">
     @Html.AntiForgeryToken()
         <div class="container">
-            <p>
+            <div class="form-group">
                 <label for="Name"><b>Recipe Name</b></label>
-                <input type="text" placeholder="Name" name="Name" required>
-            </p>
-            <p>
+                <input type="text" placeholder="Name" class="form-control" name="Name" required>
+            
+            
                 <label for="PrepTimeMinutes"><b>Prep Time</b></label>
                 <input type="number" placeholder="Prep Time (Minutes)" name="PrepTimeMinutes" required>
-            </p>
-            <p>
+            
+            
                 <label for="CookTimeMinutes"><b>Cook Time</b></label>
                 <input type="number" placeholder="Cook Time (Minutes)" name="CookTimeMinutes" required>
-            </p>
+            </div>
 
             <hr />
 
@@ -36,8 +36,10 @@
             </div>
             <button type="button" id="add-ingredient-btn">+ Add Ingredient</button>
 
-            <button type="submit">Save Recipe</button>
-            <a asp-action="MyRecipes">Cancel</a>
+            <hr />
+
+                <button type="submit">Save Recipe</button>
+                <button type="button" value="Cancel" onclick="window.location.href='/Recipe/MyRecipes';">Cancel</button>
         </div>
     </form>
 
@@ -131,7 +133,7 @@
                     ingDiv.querySelector('label').innerText = `Ingredient ${i + 1}:`;
                     //Update input
                     const input = ingDiv.querySelector('input[type="text"]');
-                    input.Name = `Ingrediests[${i}].Ingredient.Name`;
+                    input.Name = `Ingredients[${i}].Ingredient.Name`;
                     input.Quantity = `Ingredients[${i}].Quantity`
                 });
                 ingredientIndex = items.length;
