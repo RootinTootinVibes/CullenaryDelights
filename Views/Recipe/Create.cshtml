@@ -44,7 +44,7 @@
     </form>
 
     @section Scripts {    
-        <script type="text/javascript">
+        <script>
             console.log("script running");
             // Keep counters so fields are named Steps[0], Steps[1], etc.
             let stepIndex = 0;
@@ -97,6 +97,8 @@
                     <button type="button" class="remove-ingredients-btn">Remove</button>
                 `;
                 container.appendChild(ingDiv);
+                ingredientIndex++;
+            });
 
                 ingDiv.querySelector('.remove-ingredient-btn').addEventListener('click', () => {
                     container.removeChild(ingDiv);
@@ -109,8 +111,6 @@
                     });
                 });
 
-                ingredientIndex++;
-            });
 
             function reindexSteps() {
                 const container = document.getElementById('steps-container');

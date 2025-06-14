@@ -70,7 +70,7 @@
 
     @section Scripts {
 
-        <script type="text/javascript">
+        <script>
             // Keep counters so fields are named Steps[0], Steps[1], etc.
             let stepIndex = @Model.Steps.Count;
             let ingredientIndex = @Model.Ingredients.Count;
@@ -80,6 +80,7 @@
             document.getElementById('add-step-btn').addEventListener('click', () => {
 
                 // Create a new DIV to hold this step's fields
+                console.log("button clicked");
                 const stepDiv = document.createElement("div");
                 stepDiv.classList.add("step-item");
                 stepDiv.innerHTML = `
@@ -102,7 +103,6 @@
                     }
 
                 });
-            });
 
             const fullIngDiv = document.getElementById('ingredients-container');
 

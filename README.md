@@ -39,7 +39,7 @@ An ASP.NET Core MVC application for creating, managing, and discovering cooking 
 
 4. Run the Application
 - **dotnet run
-- **Open your browser at https://localhost:5001 (or the URL shown in the console).
+- **Open your browser at https://localhost:5111 (or the URL shown in the console).
 
 ## Project Structure
 
