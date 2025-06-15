@@ -156,7 +156,7 @@ public class RecipeController : Controller
             TotalTimeMinutes = recipe.PrepTimeMinutes + recipe.CookTimeMinutes,
             UserID = user.UserID,
             RecipeID = recipe.RecipeID,
-            CreatedAt = DateTime.Now
+            CreatedAt = DateTime.UtcNow
         };
 
         _context.Recipes.Add(dbRecipe);
@@ -290,6 +290,7 @@ public class RecipeController : Controller
 
         _context.RecipeIngredients.Where(x => x.RecipeID == recipeID).ExecuteDelete();
         _context.Steps.Where(x => x.RecipeID == recipeID).ExecuteDelete();
+        _context.CommentsAndRatings.Where(x => x.RecipeID == recipeID).ExecuteDelete();
         _context.Recipes.Remove(recipe);
         _context.SaveChanges();
 
